@@ -799,8 +799,6 @@ void mvaROC()
     }
   }
 
-  if(sigeff
-  
   for(unsigned int iw=0; iw<labelsv.size(); iw++) {
     rocsv.push_back(new TGraphErrors(cutsv.size(), sigeff[iw], bkgeff[iw], 0, 0));
   }
