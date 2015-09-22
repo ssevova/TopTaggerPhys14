@@ -41,7 +41,7 @@ void mvaTrain()
   //   outfilename = "toptrainingbits_noMdrop_noDR_lowpt.root";
   // }
 
-  outfilename = "toptrainingbits_noCosTS.root";
+  outfilename = "toptrainingbits_baseMVA.root";
   const double TOPMASSLOW  = 100;
   const double TOPMASSHIGH = 300;
   
@@ -78,8 +78,8 @@ void mvaTrain()
   t_sig->Branch("bjcsv",  &bjcsv);
   t_sig->Branch("jet1csv",  &jet1csv);
   t_sig->Branch("jet2csv",  &jet2csv);
-  t_sig->Branch("prob",   &prob);
-  t_sig->Branch("cost",   &cost);
+  // t_sig->Branch("prob",   &prob);
+  // t_sig->Branch("cost",   &cost);
   // t_sig->Branch("cosTS1",  &cosTS1);
   // t_sig->Branch("cosTS2",  &cosTS2);   
  
@@ -100,8 +100,8 @@ void mvaTrain()
   t_bkg1->Branch("bjcsv",  &bjcsv);
   t_bkg1->Branch("jet1csv",  &jet1csv);
   t_bkg1->Branch("jet2csv",  &jet2csv);
-  t_bkg1->Branch("prob",  &prob);
-  t_bkg1->Branch("cost",  &cost);
+  // t_bkg1->Branch("prob",  &prob);
+  // t_bkg1->Branch("cost",  &cost);
   // t_bkg1->Branch("cosTS1",  &cosTS1);
   // t_bkg1->Branch("cosTS2",  &cosTS2);     
 
@@ -123,8 +123,8 @@ void mvaTrain()
   t_bkg2->Branch("bjcsv",  &bjcsv);
   t_bkg2->Branch("jet1csv",  &jet1csv);
   t_bkg2->Branch("jet2csv",  &jet2csv);
-  t_bkg2->Branch("prob",     &prob);
-  t_bkg2->Branch("cost",     &cost);
+  // t_bkg2->Branch("prob",     &prob);
+  // t_bkg2->Branch("cost",     &cost);
   // t_bkg2->Branch("cosTS1",  &cosTS1);
   // t_bkg2->Branch("cosTS2",  &cosTS2);     
   
@@ -145,8 +145,8 @@ void mvaTrain()
   t_bkg3->Branch("bjcsv",  &bjcsv);
   t_bkg3->Branch("jet1csv",  &jet1csv);
   t_bkg3->Branch("jet2csv",  &jet2csv);
-  t_bkg3->Branch("prob",     &prob);
-  t_bkg3->Branch("cost",     &cost);
+  // t_bkg3->Branch("prob",     &prob);
+  // t_bkg3->Branch("cost",     &cost);
   // t_bkg3->Branch("cosTS1",  &cosTS1);
   // t_bkg3->Branch("cosTS2",  &cosTS2);
   
@@ -180,8 +180,8 @@ void mvaTrain()
   intree->SetBranchAddress("vjet1",   &vjet1);
   intree->SetBranchAddress("vjet2",   &vjet2);
   intree->SetBranchAddress("vjet3",   &vjet3);
-  intree->SetBranchAddress("prob",   &prob);
-  intree->SetBranchAddress("cost",   &cost);
+  // intree->SetBranchAddress("prob",   &prob);
+  // intree->SetBranchAddress("cost",   &cost);
   // intree->SetBranchAddress("cosTS1",  &cosTS1);
   // intree->SetBranchAddress("cosTS2",  &cosTS2);
   
@@ -242,8 +242,8 @@ void mvaTrain()
   factory->AddVariable("bjcsv",   'F');
   factory->AddVariable("jet1csv",   'F');
   factory->AddVariable("jet2csv",   'F');
-  factory->AddVariable("prob",    'F');
-  factory->AddVariable("cost",    'F');
+  // factory->AddVariable("prob",    'F');
+  // factory->AddVariable("cost",    'F');
   // factory->AddVariable("cosTS1",   'F');
   // factory->AddVariable("cosTS2",   'F');
  
