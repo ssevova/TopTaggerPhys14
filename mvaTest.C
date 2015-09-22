@@ -35,7 +35,7 @@ void mvaTest()
   //==============================================================================================================
    
   const string infilename("trainingbits_semilep.root");
-  const string outfilename("testingbits_baseMVA+prob+cost_tt1l.root");
+  const string outfilename("testingbits_baseMVA_tt1l.root");
  
   const double TOPMASSLOW  = 100;
   const double TOPMASSHIGH = 300;
@@ -46,7 +46,7 @@ void mvaTest()
     
   //
   vector<string> weightfilesv;
-  weightfilesv.push_back("weights/toptrainingbits_noCosTS.root_BDTG.weights.xml");
+  weightfilesv.push_back("weights/toptrainingbits_baseMVA.root_BDTG.weights.xml");
 
   unsigned int bkgType;
   unsigned int isSig, b_mis, w_mis, wb_mis, evtType, eventNum;
@@ -82,8 +82,8 @@ void mvaTest()
   outTree->Branch("bjcsv",     &bjcsv,     "bjcsv/F");
   outTree->Branch("jet1csv",   &jet1csv,   "jet1csv/F");
   outTree->Branch("jet2csv",   &jet2csv,   "jet2csv/F");
-  outTree->Branch("prob",      &prob,      "prob/F");
-  outTree->Branch("cost",      &cost,      "cost/F");
+  // outTree->Branch("prob",      &prob,      "prob/F");
+  // outTree->Branch("cost",      &cost,      "cost/F");
   // outTree->Branch("cosTS1",     &cosTS1,     "cosTS1/F");
   // outTree->Branch("cosTS2",     &cosTS2,     "cosTS2/F");
   outTree->Branch("q1vec", "TLorentzVector", &q1vec);
@@ -115,8 +115,8 @@ void mvaTest()
     readers[iw]->AddVariable("bjcsv",  &bjcsv);
     readers[iw]->AddVariable("jet1csv", &jet1csv);
     readers[iw]->AddVariable("jet2csv", &jet2csv);
-    readers[iw]->AddVariable("prob",    &prob);
-    readers[iw]->AddVariable("cost",    &cost);
+    // readers[iw]->AddVariable("prob",    &prob);
+    // readers[iw]->AddVariable("cost",    &cost);
     // readers[iw]->AddVariable("cosTS1",    &cosTS1);
     // readers[iw]->AddVariable("cosTS2",    &cosTS2);
     readers[iw]->BookMVA("BDTG", weightfilesv[iw].c_str());
@@ -148,8 +148,8 @@ void mvaTest()
   intree->SetBranchAddress("bjcsv",    &bjcsv);
   intree->SetBranchAddress("jet1csv",  &jet1csv);
   intree->SetBranchAddress("jet2csv",  &jet2csv);
-  intree->SetBranchAddress("prob",     &prob);
-  intree->SetBranchAddress("cost",     &cost);
+  // intree->SetBranchAddress("prob",     &prob);
+  // intree->SetBranchAddress("cost",     &cost);
   // intree->SetBranchAddress("cosTS1",    &cosTS1);
   // intree->SetBranchAddress("cosTS2",    &cosTS2);
   intree->SetBranchAddress("q1vec",    &q1vec);
