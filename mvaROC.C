@@ -44,9 +44,9 @@ void mvaROC()
   
   vector<string> infilename; 
   string outputDir;
-  // infilename.push_back("TestingBits/testingbits_baseMVA_tt1l.root");
+  infilename.push_back("TestingBits/testingbits_baseMVA_tt1l.root");
   // infilename.push_back("TestingBits/testingbits_baseMVA+prob_tt1l.root");
-  infilename.push_back("TestingBits/testingbits_baseMVA+prob+cost_tt1l.root");
+  // infilename.push_back("TestingBits/testingbits_baseMVA+prob+cost_tt1l.root");
   
   // infilename.push_back("TestingBits/testingbits_inclZjets.root");
   // infilename.push_back("TestingBits/testingbits_noMdrop_inclZjets.root");
@@ -142,6 +142,7 @@ void mvaROC()
   float sig_prob, sig_cost;
   float sig_cosTS, sig_cosTS1, sig_cosTS2;
   float sig_mva, sig_mtop, sig_mw;
+  float sig_genTopPt;
   unsigned int sig_sample;
   
   unsigned int bkg_type;
@@ -153,6 +154,7 @@ void mvaROC()
   float bkg_prob, bkg_cost;
   float bkg_cosTS, bkg_cosTS1, bkg_cosTS2;
   float bkg_mva, bkg_mtop, bkg_mw;
+
   unsigned int bkg_sample;
   
   TFile *outFile = new TFile("SigBkgROC.root","RECREATE");
@@ -171,14 +173,15 @@ void mvaROC()
   sigTree->Branch("sig_jet1csv",  &sig_jet1csv,  "sig_jet1csv/F");
   sigTree->Branch("sig_jet2csv",  &sig_jet2csv,  "sig_jet2csv/F");
   sigTree->Branch("sig_weight",   &sig_weight,   "sig_weight/F");
-  sigTree->Branch("sig_prob",     &sig_prob,     "sig_prob/F");
-  sigTree->Branch("sig_cost",     &sig_cost,     "sig_cost/F");
+  // sigTree->Branch("sig_prob",     &sig_prob,     "sig_prob/F");
+  // sigTree->Branch("sig_cost",     &sig_cost,     "sig_cost/F");
   // sigTree->Branch("sig_cosTS",     &sig_cosTS,     "sig_cosTS/F");
   // sigTree->Branch("sig_cosTS1",     &sig_cosTS1,     "sig_cosTS1/F");
   // sigTree->Branch("sig_cosTS2",     &sig_cosTS2,     "sig_cosTS2/F");
   sigTree->Branch("sig_mva",      &sig_mva,      "sig_mva/F");
   sigTree->Branch("sig_mtop",      &sig_mtop,      "sig_mtop/F");
   sigTree->Branch("sig_mw",      &sig_mw,      "sig_mw/F");
+  sigTree->Branch("sig_genTopPt", &sig_genTopPt, "sig_genTopPt/F");
   sigTree->Branch("sig_sample",   &sig_sample,   "sig_sample/i");
   
   
@@ -197,8 +200,8 @@ void mvaROC()
   bkgTree->Branch("bkg_jet1csv",  &bkg_jet1csv,  "bkg_jet1csv/F");
   bkgTree->Branch("bkg_jet2csv",  &bkg_jet2csv,  "bkg_jet2csv/F");
   bkgTree->Branch("bkg_weight",   &bkg_weight,   "bkg_weight/F");
-  bkgTree->Branch("bkg_prob",     &bkg_prob,     "bkg_prob/F");
-  bkgTree->Branch("bkg_cost",     &bkg_cost,     "bkg_cost/F");
+  // bkgTree->Branch("bkg_prob",     &bkg_prob,     "bkg_prob/F");
+  // bkgTree->Branch("bkg_cost",     &bkg_cost,     "bkg_cost/F");
   // bkgTree->Branch("bkg_cosTS",     &bkg_cosTS,     "bkg_cosTS/F");
   // bkgTree->Branch("bkg_cosTS1",   &bkg_cosTS1,   "bkg_cosTS1/F");
   // bkgTree->Branch("bkg_cosTS2",   &bkg_cosTS2,   "bkg_cosTS2/F");
@@ -238,9 +241,9 @@ void mvaROC()
   // labelsv.push_back("Z(#nu#nu)+jets & b-tag bkg (no Mdrop)");   colorsv.push_back(kRed);        linesv.push_back(1);
 
   // // N-1 Plotting (including kinematic fitter variables and cos theta star)
-  // labelsv.push_back("t#bar{t}(1l) base MVA");                  colorsv.push_back(kGreen+2);   linesv.push_back(1);
+   labelsv.push_back("t#bar{t}(1l) base MVA");                  colorsv.push_back(kGreen+2);   linesv.push_back(1);
   // labelsv.push_back("t#bar{t}(1l) base MVA+prob");             colorsv.push_back(kPink+4);   linesv.push_back(1);
-  labelsv.push_back("t#bar{t}(1l) base MVA+prob+cost");        colorsv.push_back(kBlue-4);   linesv.push_back(1);
+  // labelsv.push_back("t#bar{t}(1l) base MVA+prob+cost");        colorsv.push_back(kBlue-4);   linesv.push_back(1);
   // labelsv.push_back("t#bar{t} 1L [no cos(#theta*)]");        colorsv.push_back(kGreen-3);   linesv.push_back(7);
   // labelsv.push_back("t#bar{t} 1L [no QG])");        colorsv.push_back(kGreen-3);   linesv.push_back(4);
   // labelsv.push_back("t#bar{t} 1L [no kin fit]");        colorsv.push_back(kGreen-3);   linesv.push_back(9);
@@ -339,7 +342,8 @@ void mvaROC()
     float qgid1, qgid2, mdrop;
     float cost, prob, cosTS, cosTS1, cosTS2;
     float topmva;
-    TLorentzVector *vjet1=0, *vjet2=0, *vjet3=0; 
+    TLorentzVector *vjet1=0, *vjet2=0, *vjet3=0;
+    TLoretnzVector *q1vec=0, *q2vec=0, *q3vec=0;
  
         
     std::cout << "Processing " << infilename[ifile] << "..." << std::endl;
@@ -406,6 +410,11 @@ void mvaROC()
       intree->SetBranchAddress("vjet2", &vjet2);
       intree->SetBranchAddress("vjet3", &vjet3);
     }
+    if(intree->GetBranchStatus("q1vec")==1){
+      intree->SetBranchAddress("q1vec", &q1vec);
+      intree->SetBranchAddress("q2vec", &q2vec);
+      intree->SetBranchAddress("q3vec", &q3vec);
+    }
     vector<float> comboMVA;
     vector < std::pair <int,int> > entryNum;
     
@@ -459,6 +468,10 @@ void mvaROC()
 	  TLorentzVector  j1 = *vjet1;
 	  TLorentzVector  j2 = *vjet2;
 	  TLorentzVector  j3 = *vjet3;
+
+	  TLorentzVector q1 = *q1vec; TLorentzVector q2 = *q2vec; TLorentzVector q3 = *q3vec;
+
+	  pt_jjj = (q1+q2+q3).Pt();
 	  
 	  m_jj  = (j1+j2).M();
 	  m_jjj = (j1+j2+j3).M();
@@ -475,14 +488,15 @@ void mvaROC()
 	  sig_jet1csv = jet1csv;
 	  sig_jet2csv = jet2csv;
 	  sig_weight  = weight;
-	  sig_prob    = prob;
-	  sig_cost    = cost;
+	  // sig_prob    = prob;
+	  // sig_cost    = cost;
 	  // sig_cosTS   = cosTS;
 	  // sig_cosTS1   = cosTS1;
 	  // sig_cosTS2   = cosTS2;
 	  sig_mva     = sigmva[ifile];
 	  sig_mtop    = m_jjj;
 	  sig_mw      = m_jj;
+	  sig_genTopPt = pt_jjj;
 	  sig_sample  = ifile;
 
 	  sigTree     ->Fill();
@@ -515,8 +529,8 @@ void mvaROC()
 	  bkg_jet1csv = jet1csv;
 	  bkg_jet2csv = jet2csv;
 	  bkg_weight  = weight;
-	  bkg_prob    = prob;
-	  bkg_cost    = cost;
+	  // bkg_prob    = prob;
+	  // bkg_cost    = cost;
 	  // bkg_cosTS   = cosTS;
 	  // bkg_cosTS1  = cosTS1;
 	  // bkg_cosTS2  = cosTS2;
@@ -697,7 +711,9 @@ void mvaROC()
   TH1D * hSigMw = new TH1D("SigMw","",50,0,250);     hSigMw->Sumw2();
   TH1D * hBkgMtop = new TH1D("BkgMtop","",50,0,400); hBkgMtop->Sumw2();
   TH1D * hBkgMw = new TH1D("BkgMw","",50,0,250);     hBkgMw->Sumw2();
-  
+
+  TH1D * hSigTopPt = new TH1D("SigTopPt","",50,100,700); hSigTopPt->Sumw2();
+    
   TFile *inSigBkgfile = TFile::Open("SigBkgROC.root");         assert(inSigBkgfile);
   TTree *inSigtree = (TTree*)inSigBkgfile->Get("sigEvents");   assert(inSigtree);
   TTree *inBkgtree = (TTree*)inSigBkgfile->Get("bkgEvents");   assert(inBkgtree);
@@ -714,14 +730,15 @@ void mvaROC()
   inSigtree->SetBranchAddress("sig_jet1csv",  &sig_jet1csv);
   inSigtree->SetBranchAddress("sig_jet2csv",  &sig_jet2csv);
   inSigtree->SetBranchAddress("sig_weight",   &sig_weight);
-  inSigtree->SetBranchAddress("sig_prob",     &sig_prob);
-  inSigtree->SetBranchAddress("sig_cost",     &sig_cost);
+  // inSigtree->SetBranchAddress("sig_prob",     &sig_prob);
+  // inSigtree->SetBranchAddress("sig_cost",     &sig_cost);
   // inSigtree->SetBranchAddress("sig_cosTS",    &sig_cosTS);
   // inSigtree->SetBranchAddress("sig_cosTS1",    &sig_cosTS1);
   // inSigtree->SetBranchAddress("sig_cosTS2",    &sig_cosTS2);
   inSigtree->SetBranchAddress("sig_mtop",     &sig_mtop);
   inSigtree->SetBranchAddress("sig_mw",       &sig_mw);
   inSigtree->SetBranchAddress("sig_mva",      &sig_mva);
+  inSigtree->SetBranchAddress("sig_genTopPt", &sig_genTopPt);
   inSigtree->SetBranchAddress("sig_sample",   &sig_sample);
   
   inBkgtree->SetBranchAddress("bkg_bmis",  &bkg_bmis);
@@ -740,8 +757,8 @@ void mvaROC()
   inBkgtree->SetBranchAddress("bkg_jet2csv", &bkg_jet2csv);
   inBkgtree->SetBranchAddress("bkg_weight",  &bkg_weight);
   inBkgtree->SetBranchAddress("bkg_type",    &bkg_type);
-  inBkgtree->SetBranchAddress("bkg_prob",     &bkg_prob);
-  inBkgtree->SetBranchAddress("bkg_cost",     &bkg_cost);
+  // inBkgtree->SetBranchAddress("bkg_prob",     &bkg_prob);
+  // inBkgtree->SetBranchAddress("bkg_cost",     &bkg_cost);
   // inBkgtree->SetBranchAddress("bkg_cosTS",    &bkg_cosTS);
   // inBkgtree->SetBranchAddress("bkg_cosTS1",    &bkg_cosTS1);
   // inBkgtree->SetBranchAddress("bkg_cosTS2",    &bkg_cosTS2);
@@ -754,9 +771,10 @@ void mvaROC()
   for(unsigned int isig=0; isig<inSigtree->GetEntries(); isig++) {
     inSigtree->GetEntry(isig);
 
-    if(sig_mva > -0.42){ //corresponds roughly to sig efficiency 60 % for baseMVA+prob+cost
+    if(sig_mva > -0.45){ //corresponds roughly to sig efficiency 60 % for baseMVA
       if(sig_mtop != -999){ hSigMtop->Fill(sig_mtop); }
       if(sig_mw   != -999){ hSigMw  ->Fill(sig_mw);   }
+      hSigTopPt->Fill(sig_genTopPt);
     }
     
     for(unsigned int ic=0; ic<cutsv.size(); ic++) {
@@ -769,7 +787,7 @@ void mvaROC()
   
   for(unsigned int ibkg=0; ibkg<inBkgtree->GetEntries(); ibkg++){
     inBkgtree->GetEntry(ibkg);
-    if(bkg_mva > -0.42){
+    if(bkg_mva > -0.45){
       if(bkg_mtop != -999){ hBkgMtop->Fill(bkg_mtop); }
       if(bkg_mw   != -999){ hBkgMw  ->Fill(bkg_mw);   }
     }
@@ -863,6 +881,12 @@ void mvaROC()
   plotMw.AddHist1D(hSigMw, "Signal","hist",kRed+2,1,3004);
   plotMw.TransLegend(-0.05,-0.05);
   plotMw.Draw(c,true,"png");
+
+  sprintf(ylabel,"Fraction / %.2f",hSigTopPt->GetBinWidth(1));
+  CPlot plotGenTopPt("genTopPt","","top p_{T}",ylabel);
+  plotGenTopPt.AddHist1D(hSigTopPt,"","E",kRed+2,1,1001);
+  plotGenTopPt.Draw(c,true,"png");
+		   
 
   // sprintf(ylabel,"Fraction / %.2f",hmdropv[0]->GetBinWidth(1));
   // CPlot plotmdropZjets("mdrop_zjets","","#zeta",ylabel);
