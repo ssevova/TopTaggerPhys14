@@ -45,8 +45,9 @@ void mvaROC()
   vector<string> infilename; 
   string outputDir;
   infilename.push_back("TestingBits/testingbits_baseMVA_tt1l.root");
-  infilename.push_back("TestingBits/testingbits_baseMVA+prob_tt1l.root");
-  infilename.push_back("TestingBits/testingbits_baseMVA+prob+cost_tt1l.root");
+    
+  // infilename.push_back("TestingBits/testingbits_baseMVA+prob_tt1l.root");
+  // infilename.push_back("TestingBits/testingbits_baseMVA+prob+cost_tt1l.root");
   
   // infilename.push_back("TestingBits/testingbits_inclZjets.root");
   // infilename.push_back("TestingBits/testingbits_noMdrop_inclZjets.root");
@@ -239,11 +240,11 @@ void mvaROC()
   // labelsv.push_back("Z(#nu#nu)+jets bkg (no Mdrop)");           colorsv.push_back(kViolet+9);   linesv.push_back(7);
   // labelsv.push_back("Z(#nu#nu)+jets & b-tag bkg (with Mdrop)"); colorsv.push_back(kOrange+7);        linesv.push_back(7);
   // labelsv.push_back("Z(#nu#nu)+jets & b-tag bkg (no Mdrop)");   colorsv.push_back(kRed);        linesv.push_back(1);
-
+  
   // // N-1 Plotting (including kinematic fitter variables and cos theta star)
   labelsv.push_back("t#bar{t}(1l) base MVA");                  colorsv.push_back(kGreen+2);   linesv.push_back(1);
-  labelsv.push_back("t#bar{t}(1l) base MVA+prob");             colorsv.push_back(kPink+4);   linesv.push_back(1);
-  labelsv.push_back("t#bar{t}(1l) base MVA+prob+cost");        colorsv.push_back(kBlue-4);   linesv.push_back(1);
+  // labelsv.push_back("t#bar{t}(1l) base MVA+prob");             colorsv.push_back(kPink+4);   linesv.push_back(1);
+  // labelsv.push_back("t#bar{t}(1l) base MVA+prob+cost");        colorsv.push_back(kBlue-4);   linesv.push_back(1);
   // labelsv.push_back("t#bar{t} 1L [no cos(#theta*)]");        colorsv.push_back(kGreen-3);   linesv.push_back(7);
   // labelsv.push_back("t#bar{t} 1L [no QG])");        colorsv.push_back(kGreen-3);   linesv.push_back(4);
   // labelsv.push_back("t#bar{t} 1L [no kin fit]");        colorsv.push_back(kGreen-3);   linesv.push_back(9);
@@ -306,9 +307,32 @@ void mvaROC()
   //labelsv.push_back("all variables");                 colorsv.push_back(kViolet+2);     linesv.push_back(1);
 
   vector<float> mvaWP;
-  mvaWP.push_back(-0.45);//0.42); // 60% sig eff for baseMVA
-  mvaWP.push_back(-0.40);//0.40); // 60% sig eff for base+prob
-  mvaWP.push_back(-0.42);//0.42); // 60% sig eff for base+prob+cost
+  mvaWP.push_back(-1.0);
+  mvaWP.push_back(-0.9);
+  mvaWP.push_back(-0.8);
+  mvaWP.push_back(-0.7);
+  mvaWP.push_back(-0.6);
+  mvaWP.push_back(-0.5);
+  mvaWP.push_back(-0.4);
+  mvaWP.push_back(-0.3);
+  mvaWP.push_back(-0.2);
+  mvaWP.push_back(-0.1);
+  mvaWP.push_back(0.0);
+  mvaWP.push_back(0.1);
+  mvaWP.push_back(0.2);
+  mvaWP.push_back(0.3);
+  mvaWP.push_back(0.4);
+  mvaWP.push_back(0.5);
+  mvaWP.push_back(0.6);
+  mvaWP.push_back(0.7);
+  mvaWP.push_back(0.8);
+  mvaWP.push_back(0.9);
+
+  
+  
+  // mvaWP.push_back(0.42);//-0.45); 90% eff //0.42); // 60% sig eff for baseMVA
+  // mvaWP.push_back(0.40);//-0.40); 90% eff //0.40); // 60% sig eff for base+prob
+  // mvaWP.push_back(0.42);//-0.42); 90% eff //0.42); // 60% sig eff for base+prob+cost
  
   vector<double> cutsv;
   for(unsigned int i=0; i<21; i++) {
@@ -321,6 +345,8 @@ void mvaROC()
   
   vector <double> Npass[labelsv.size()];
   vector <double> Nfail[labelsv.size()];
+  vector <double> mvaNpass[labelsv.size()];
+  vector <double> mvaNfail[labelsv.size()];
   
   vector <double> ptlow, pthigh;
   ptlow.push_back(0);   pthigh.push_back(20);
@@ -336,7 +362,21 @@ void mvaROC()
   ptlow.push_back(260); pthigh.push_back(300);
   ptlow.push_back(300); pthigh.push_back(340);
   ptlow.push_back(340); pthigh.push_back(400);
-    
+
+  vector <double> mvalow, mvahigh;
+
+  mvalow.push_back(-1.0); mvahigh.push_back(-0.8);
+  mvalow.push_back(-0.8); mvahigh.push_back(-0.6);
+  mvalow.push_back(-0.6); mvahigh.push_back(-0.4);
+  mvalow.push_back(-0.4); mvahigh.push_back(-0.2);
+  mvalow.push_back(-0.2); mvahigh.push_back(0.0);
+  mvalow.push_back(0.0);  mvahigh.push_back(0.2);
+  mvalow.push_back(0.2);  mvahigh.push_back(0.4);
+  mvalow.push_back(0.4);  mvahigh.push_back(0.6);
+  mvalow.push_back(0.6);  mvahigh.push_back(0.8);
+  mvalow.push_back(0.8);  mvahigh.push_back(1.0);
+
+
   for(unsigned int iw=0; iw<labelsv.size(); iw++) {
     for(unsigned int ic=0; ic<cutsv.size(); ic++) {
       sigpass[iw].push_back(0);
@@ -349,9 +389,13 @@ void mvaROC()
       Npass[iw].push_back(0);
       Nfail[iw].push_back(0);
     }
+    for(unsigned int it=0; it<mvalow.size(); it++){
+      mvaNpass[iw].push_back(0);
+      mvaNfail[iw].push_back(0);
+    }
   }
 
-  
+  vector<TGraphErrors*> MvaEff;
   vector<TGraphErrors*> TopEff;
   vector<TGraphErrors*> rocsv;
 
@@ -740,6 +784,7 @@ void mvaROC()
   //
   // Read in signal and background trees for ROC curve
   //
+ 
   vector<TH1D*> hSigTopPt, hSigMtop, hSigMw, hBkgMtop, hBkgMw;
   for(unsigned int it=0; it<labelsv.size(); it++){
      sprintf(hname,"gentoppt_%i",it);  hSigTopPt.push_back(new TH1D(hname,"",50,0,400)); hSigTopPt[it]->Sumw2();
@@ -804,18 +849,26 @@ void mvaROC()
 
   
   vector < pair < float,float > > ptpaireff[labelsv.size()];
+  vector < pair < float,float > > mvapaireff[labelsv.size()];
   
   for(unsigned int isig=0; isig<inSigtree->GetEntries(); isig++) {
     inSigtree->GetEntry(isig);
+    hSigTopPt[sig_sample]->Fill(sig_genTopPt);
+
 
     if(sig_mva > mvaWP[sig_sample]){ 
 
+      
       hSigTopPt[sig_sample]->Fill(sig_genTopPt);
       if(sig_mtop != -999){ hSigMtop[sig_sample]->Fill(sig_mtop); }
       if(sig_mw   != -999){ hSigMw[sig_sample]  ->Fill(sig_mw);   }
+
       ptpaireff[sig_sample].push_back(make_pair(1,sig_genTopPt));
+      mvapaireff[sig_sample].push_back(make_pair(1,sig_mva));
     } else {
+
       ptpaireff[sig_sample].push_back(make_pair(0,sig_genTopPt));
+      mvapaireff[sig_sample].push_back(make_pair(0,sig_mva));
     }
     
     for(unsigned int ic=0; ic<cutsv.size(); ic++) {
@@ -869,6 +922,15 @@ void mvaROC()
 	}
       }
     }
+    
+    for(unsigned int imv=0; imv < mvalow.size(); ++imv){
+      for(unsigned int ip=0; ip < mvapaireff[is].size(); ++ip){
+	if(mvapaireff[is][ip].second > mvalow[imv] && mvapaireff[is][ip].second < mvahigh[imv]){
+	  if(mvapaireff[is][ip].first==1)         {mvaNpass[is][imv] += 1; }
+	  if(mvapaireff[is][ip].first==0)         {mvaNfail[is][imv] += 1; }
+	}
+      }
+    }
   }
 
   double topeff[labelsv.size()][ptlow.size()];
@@ -877,15 +939,28 @@ void mvaROC()
       topeff[iw][ip] = Npass[iw][ip]/(Npass[iw][ip]+Nfail[iw][ip]);
     }
   }
+  double mvaeff[labelsv.size()][mvalow.size()];
+  for(unsigned int iw=0; iw < labelsv.size(); iw++){
+    for(unsigned int ip=0; ip < mvalow.size(); ip++){
+      mvaeff[iw][ip] = mvaNpass[iw][ip]/(mvaNpass[iw][ip]+mvaNfail[iw][ip]);
+    }
+  }
+  
 
   double ptmid[ptlow.size()];
   for(unsigned int im=0; im<ptlow.size(); im++){
     ptmid[im] = (ptlow[im]+pthigh[im])/2.0;
   }
 
+  double mvamid[mvalow.size()];
+  for(unsigned int im=0; im<mvalow.size(); im++){
+    mvamid[im] = (mvalow[im]+mvahigh[im])/2.0;
+  }
+
   for(unsigned int iw=0; iw<labelsv.size(); iw++) {
     rocsv.push_back(new TGraphErrors(cutsv.size(), sigeff[iw], bkgeff[iw], 0, 0));
-    TopEff.push_back(new TGraphErrors(ptlow.size(), ptmid, topeff[iw], 0 ,0));    
+    TopEff.push_back(new TGraphErrors(ptlow.size(), ptmid, topeff[iw], 0 ,0));
+    MvaEff.push_back(new TGraphErrors(mvalow.size(), mvamid, mvaeff[iw],0,0));
   }
   
  
@@ -946,7 +1021,18 @@ void mvaROC()
   ploteff.SetXRange(0,400);
   ploteff.TransLegend(-0.05,-0.02);
   ploteff.Draw(c,true,"png");
- 
+
+
+  CPlot plotmvaeff("mvaeffvsscore","","mva score", "#epsilon");
+  for(unsigned int im=0; im<labelsv.size(); im++) {
+    plotmvaeff.AddGraph(MvaEff[im], labelsv[im].c_str(),"CP",colorsv[im], kFullDotLarge,7);
+  }
+  plotmvaeff.SetYRange(0,1);
+  plotmvaeff.SetXRange(-1,1);
+  plotmvaeff.TransLegend(-0.05,-0.02);
+  plotmvaeff.Draw(c,true,"png");
+
+  
   for(unsigned int it=0; it<labelsv.size(); it++){
     sprintf(ylabel, "Fraction / %.2f", hSigMtop[it]->GetBinWidth(1));
     sprintf(hname,"mtop_%i",it);
