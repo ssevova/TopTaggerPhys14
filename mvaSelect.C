@@ -66,12 +66,12 @@ void mvaSelect()
   //
   // input/output file
   //  
-  const string infilename("/tthome/ssevova/Analysis/phys14/CMSSW_7_2_2_patch1/src/DMSAna/ttDM/baconbits/Phys14-PU20bx25_TTJets_MSDecaysCKM_central_Tune4C_AOD_dilepbits.root");
+  const string infilename("/tthome/ssevova/Analysis/phys14/CMSSW_7_2_2_patch1/src/DMSAna/ttDM/baconbits/Phys14-PU20bx25_TTJets_MSDecaysCKM_central_Tune4C_AOD_ptsortbits.root");
   // const string outfilename("dummy.root");
-  const string outfilename("trainingbits_dilep.root");
+  const string outfilename("trainingbits_tthad_ptsort.root");
     
   // plot output directory
-  const string outputDir("TopPlots_dilep");
+  const string outputDir("TopPlots");
 
   gSystem->mkdir(outputDir.c_str(), true);
   CPlot::sOutDir = outputDir;
@@ -93,12 +93,15 @@ void mvaSelect()
   float           pfmetraw,     pfmetphiraw,  dphijetmetraw; // raw PF MET
   float           pfmet,        pfmetphi,     dphijetmet;    // PF MET
 
+
   float           j1flavGen,  j2flavGen,  j3flavGen; 
   float           j1qgid,     j2qgid,     j3qgid;            // jet q/g discriminant
   float           j1csv,      j2csv,      j3csv;             // jet CSV b-tagger
   TLorentzVector *vjet1=0,      *vjet2=0,      *vjet3=0;     // jet 4-vector
   TLorentzVector *q1vec=0,      *q2vec=0,      *q3vec=0;
+  TLorentzVector *vpar1=0,      *vpar2=0,      *vpar3=0;
   float Prob, Cost;
+  float thadpt;
 
   //
   // Set up output file
@@ -150,8 +153,13 @@ void mvaSelect()
   outTree->Branch("q1vec", "TLorentzVector", &q1vec);
   outTree->Branch("q2vec", "TLorentzVector", &q2vec);
   outTree->Branch("q3vec", "TLorentzVector", &q3vec);
-  
 
+  outTree->Branch("vpar1", "TLorentzVector", &vpar1);
+  outTree->Branch("vpar2", "TLorentzVector", &vpar2);
+  outTree->Branch("vpar3", "TLorentzVector", &vpar3);
+
+  outTree->Branch("thadpt", &thadpt, "thadpt/F");
+  
   outTree->Branch("evtType",  &evtType,  "evtType/i");
   outTree->Branch("eventNum", &eventNum, "eventNum/i");
 
@@ -225,6 +233,12 @@ void mvaSelect()
   intree->SetBranchAddress("q2vec",         &q2vec);
   intree->SetBranchAddress("q3vec",         &q3vec);
 
+  intree->SetBranchAddress("vpar1",         &vpar1);
+  intree->SetBranchAddress("vpar2",         &vpar2);
+  intree->SetBranchAddress("vpar3",         &vpar3);
+
+  intree->SetBranchAddress("thadpt",       &thadpt);
+
   intree->SetBranchAddress("Prob",          &Prob);
   intree->SetBranchAddress("Cost",          &Cost);
 
@@ -258,8 +272,6 @@ void mvaSelect()
     j2.Boost(-1.*dijet.BoostVector());
     dijet.Boost(-1.*vtop.BoostVector());
     float costhetastar2 = TMath::Cos(j2.Angle(dijet.Vect()));
-
-
     
     if(fabs(j1.Eta())>2.4) continue;
     if(fabs(j2.Eta())>2.4) continue;
@@ -269,14 +281,15 @@ void mvaSelect()
     if(j2.Pt() < 30) continue;
     if(j3.Pt() < 30) continue;
 
-    if(j3csv > 1) continue; //removes O(100) events with inf csv values
+    if(j1csv > 1 || j2csv > 1 || j3csv > 1) continue; //removes O(100) events with inf csv values
     double wgt = 1;
     
     bool wmatch = 
       (j1flavGen==1 && j2flavGen==-2) || (j1flavGen==-2 && j2flavGen==1) || (j1flavGen==-1 && j2flavGen==2) ||  (j1flavGen==2 && j2flavGen==-1) 
       ||  (j1flavGen==3 && j2flavGen==-4) || (j1flavGen==-4 && j2flavGen==3) || (j1flavGen==-3 && j2flavGen==4) || (j1flavGen==4 && j2flavGen==-3);
 
-
+    // bool single_wmatch = fabs(j1flavGen)==1 || fabs(j1flavGen)==2 || fabs(j1flavGen)==3 || fabs(j1flavGen)==4 ||  
+    //                     fabs(j2flavGen)==1 || fabs(j2flavGen)==2 || fabs(j2flavGen)==3 || fabs(j2flavGen)==4;
     bool bmatch = false;
     if( ((j1flavGen== 1 || j1flavGen== 3) && j3flavGen==-5) ||
 	((j1flavGen==-1 || j1flavGen==-3) && j3flavGen== 5) ||
@@ -355,6 +368,13 @@ void mvaSelect()
     q1vec    = q1vec;
     q2vec    = q2vec;
     q3vec    = q3vec;
+    vpar1    = vpar1;
+    vpar2    = vpar2;
+    vpar3    = vpar3;
+
+    thadpt   = thadpt;
+    
+    
     prob     = Prob;
     cost     = Cost;
     
