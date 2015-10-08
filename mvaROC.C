@@ -45,10 +45,12 @@ void mvaROC()
   vector<string> infilename; 
   string outputDir;
   infilename.push_back("TestingBits/testingbits_baseMVA_tt1l.root");
-    
-  // infilename.push_back("TestingBits/testingbits_baseMVA+prob_tt1l.root");
-  // infilename.push_back("TestingBits/testingbits_baseMVA+prob+cost_tt1l.root");
-  
+  infilename.push_back("TestingBits/testingbits_baseMVA+prob_tt1l.root");
+  infilename.push_back("TestingBits/testingbits_baseMVA+prob+cost_tt1l.root");
+
+  // infilename.push_back("TestingBits/testingbits_baseMVA_zjetsbkg.root");
+  // infilename.push_back("TestingBits/testingbits_baseMVA+prob_zjetsbkg.root");
+  // infilename.push_back("TestingBits/testingbits_baseMVA+prob+cost_zjetsbkg.root");
   // infilename.push_back("TestingBits/testingbits_inclZjets.root");
   // infilename.push_back("TestingBits/testingbits_noMdrop_inclZjets.root");
   // infilename.push_back("TestingBits/testingbits_inclZjets_btag.root");
@@ -144,6 +146,7 @@ void mvaROC()
   float sig_cosTS, sig_cosTS1, sig_cosTS2;
   float sig_mva, sig_mtop, sig_mw;
   float sig_genTopPt;
+  unsigned int sig_evtNum;
   unsigned int sig_sample;
   
   unsigned int bkg_type;
@@ -155,13 +158,13 @@ void mvaROC()
   float bkg_prob, bkg_cost;
   float bkg_cosTS, bkg_cosTS1, bkg_cosTS2;
   float bkg_mva, bkg_mtop, bkg_mw;
-
+  unsigned int bkg_evtNum;
   unsigned int bkg_sample;
-  
+
   TFile *outFile = new TFile("SigBkgROC.root","RECREATE");
   TTree *sigTree = new TTree("sigEvents","sigEvents");
   TTree *bkgTree = new TTree("bkgEvents","bkgEvents");
-  
+
   sigTree->Branch("sig_qgid1",  &sig_qgid1,  "sig_qgid1/F");
   sigTree->Branch("sig_qgid2",  &sig_qgid2,  "sig_qgid2/F");
   sigTree->Branch("sig_detaj1b",&sig_detaj1b,"sig_detaj1b/F");
@@ -183,7 +186,9 @@ void mvaROC()
   sigTree->Branch("sig_mtop",      &sig_mtop,      "sig_mtop/F");
   sigTree->Branch("sig_mw",      &sig_mw,      "sig_mw/F");
   sigTree->Branch("sig_genTopPt", &sig_genTopPt, "sig_genTopPt/F");
+  sigTree->Branch("sig_evtNum",   &sig_evtNum,   "sig_evtNum/i");
   sigTree->Branch("sig_sample",   &sig_sample,   "sig_sample/i");
+  
   
   
   bkgTree->Branch("bkg_bmis",   &bkg_bmis,   "bkg_bmis/i");
@@ -210,12 +215,16 @@ void mvaROC()
   bkgTree->Branch("bkg_mva",      &bkg_mva,      "bkg_mva/F");
   bkgTree->Branch("bkg_mtop",     &bkg_mtop,     "bkg_mtop/F");
   bkgTree->Branch("bkg_mw",       &bkg_mw,       "bkg_mw/F");
+  bkgTree->Branch("bkg_evtNum",   &bkg_evtNum,   "bkg_evtNum/i");
   bkgTree->Branch("bkg_sample",   &bkg_sample,   "bkg_sample/i");  
+
+
+  
   
   //Declare histograms
   char hname[100];
 
- 			   
+ 
   vector <TH1D*> htopmvav, hmdropv, hdetaj1bv, hdetaj2bv,hdphij1bv,hdphij2bv, hdrj1bv,hdrj2bv, hqgid1v, hqgid2v, hbjcsv, hj1csv, hj2csv, htopmvaBkg;
   for(unsigned int icombo=0; icombo<9; icombo++){
     sprintf(hname,"hbjcsv_%i",icombo);   hbjcsv.push_back(new TH1D(hname,"",50,0,1));      hbjcsv[icombo]->Sumw2();
@@ -232,6 +241,7 @@ void mvaROC()
     sprintf(hname,"hdrj1b_%i",icombo);   hdrj1bv.push_back(new TH1D(hname,"",50,0.8,4));   hdrj1bv[icombo]->Sumw2();
     sprintf(hname,"hdrj2b_%i",icombo);   hdrj2bv.push_back(new TH1D(hname,"",50,0.8,4));   hdrj2bv[icombo]->Sumw2();
     sprintf(hname,"htopmvaBkg_%i",icombo); htopmvaBkg.push_back(new TH1D(hname,"",50,-1,1)); htopmvaBkg[icombo]->Sumw2();
+   
   }
 
   vector<string> labelsv;
@@ -242,9 +252,13 @@ void mvaROC()
   // labelsv.push_back("Z(#nu#nu)+jets & b-tag bkg (no Mdrop)");   colorsv.push_back(kRed);        linesv.push_back(1);
   
   // // N-1 Plotting (including kinematic fitter variables and cos theta star)
-  labelsv.push_back("t#bar{t}(1l) base MVA");                  colorsv.push_back(kGreen+2);   linesv.push_back(1);
-  // labelsv.push_back("t#bar{t}(1l) base MVA+prob");             colorsv.push_back(kPink+4);   linesv.push_back(1);
-  // labelsv.push_back("t#bar{t}(1l) base MVA+prob+cost");        colorsv.push_back(kBlue-4);   linesv.push_back(1);
+  labelsv.push_back("t#bar{t}(1l) base MVA");             colorsv.push_back(kGreen-4);   linesv.push_back(1);
+  labelsv.push_back("t#bar{t}(1l) base MVA+prob");        colorsv.push_back(kRed);   linesv.push_back(1);
+  labelsv.push_back("t#bar{t}(1l) base MVA+prob+cost");   colorsv.push_back(kBlue-4);   linesv.push_back(1);
+
+  // labelsv.push_back("Z(#nu#nu)+jets base MVA");           colorsv.push_back(kAzure-8);  linesv.push_back(7);
+  // labelsv.push_back("Z(#nu#nu)+jets base MVA+prob");      colorsv.push_back(kViolet+9);  linesv.push_back(7);
+  // labelsv.push_back("Z(#nu#nu)+jets base MVA+prob+cost"); colorsv.push_back(kOrange+7);  linesv.push_back(7);
   // labelsv.push_back("t#bar{t} 1L [no cos(#theta*)]");        colorsv.push_back(kGreen-3);   linesv.push_back(7);
   // labelsv.push_back("t#bar{t} 1L [no QG])");        colorsv.push_back(kGreen-3);   linesv.push_back(4);
   // labelsv.push_back("t#bar{t} 1L [no kin fit]");        colorsv.push_back(kGreen-3);   linesv.push_back(9);
@@ -306,33 +320,25 @@ void mvaROC()
   // labelsv.push_back("only #Delta R");            colorsv.push_back(kPink+9);      linesv.push_back(7);
   //labelsv.push_back("all variables");                 colorsv.push_back(kViolet+2);     linesv.push_back(1);
 
+  vector <TH1D*> hTrijetPt, hTrijetPt_ptcut, hMatchTrijetPt, hMatchTrijetPt_ptcut, hAllTopsPt, hAllTopsPt_ptcut, hGenParPt_sig, hGenParPt_bkg, hGenParEta_sig, hGenParEta_bkg;
+  for(unsigned int ip=0; ip < labelsv.size(); ++ip){
+    sprintf(hname,"hGenParPt_sig_%i",ip); hGenParPt_sig.push_back(new TH1D(hname,"",50,0,300));                hGenParPt_sig[ip]->Sumw2();
+    sprintf(hname,"hGenParPt_bkg_%i",ip); hGenParPt_bkg.push_back(new TH1D(hname,"",50,0,300));                hGenParPt_bkg[ip]->Sumw2();
+    sprintf(hname,"hGenParEta_sig_%i",ip); hGenParEta_sig.push_back(new TH1D(hname,"",50,0,4));                hGenParEta_sig[ip]->Sumw2();
+    sprintf(hname,"hGenParEta_bkg_%i",ip); hGenParEta_bkg.push_back(new TH1D(hname,"",50,0,4));                hGenParEta_bkg[ip]->Sumw2();
+    
+    sprintf(hname,"hTrijetPt_%i",ip); hTrijetPt.push_back(new TH1D(hname,"",20,0,400));                        hTrijetPt[ip]->Sumw2();
+    sprintf(hname,"hTrijetPt_ptcut_%i",ip); hTrijetPt_ptcut.push_back(new TH1D(hname,"",20,0,400));            hTrijetPt_ptcut[ip]->Sumw2();
+    sprintf(hname,"hMatchTrijetPt_%i",ip); hMatchTrijetPt.push_back(new TH1D(hname,"",20,0,400));              hMatchTrijetPt[ip]->Sumw2();
+    sprintf(hname,"hMatchTrijetPt_ptcut_%i",ip); hMatchTrijetPt_ptcut.push_back(new TH1D(hname,"",20,0,400));  hMatchTrijetPt_ptcut[ip]->Sumw2();
+    sprintf(hname,"hAllTopsPt_%i",ip); hAllTopsPt.push_back(new TH1D(hname,"",20,0,400));                      hAllTopsPt[ip]->Sumw2();
+    sprintf(hname,"hAllTopsPt_ptcut_%i",ip); hAllTopsPt_ptcut.push_back(new TH1D(hname,"",20,0,400));          hAllTopsPt_ptcut[ip]->Sumw2();
+  }
+  
   vector<float> mvaWP;
-  mvaWP.push_back(-1.0);
-  mvaWP.push_back(-0.9);
-  mvaWP.push_back(-0.8);
-  mvaWP.push_back(-0.7);
-  mvaWP.push_back(-0.6);
-  mvaWP.push_back(-0.5);
-  mvaWP.push_back(-0.4);
-  mvaWP.push_back(-0.3);
-  mvaWP.push_back(-0.2);
-  mvaWP.push_back(-0.1);
-  mvaWP.push_back(0.0);
-  mvaWP.push_back(0.1);
-  mvaWP.push_back(0.2);
-  mvaWP.push_back(0.3);
-  mvaWP.push_back(0.4);
-  mvaWP.push_back(0.5);
-  mvaWP.push_back(0.6);
-  mvaWP.push_back(0.7);
-  mvaWP.push_back(0.8);
-  mvaWP.push_back(0.9);
-
-  
-  
-  // mvaWP.push_back(0.42);//-0.45); 90% eff //0.42); // 60% sig eff for baseMVA
-  // mvaWP.push_back(0.40);//-0.40); 90% eff //0.40); // 60% sig eff for base+prob
-  // mvaWP.push_back(0.42);//-0.42); 90% eff //0.42); // 60% sig eff for base+prob+cost
+  mvaWP.push_back(-10);//0.23);// 60% sig eff for baseMVA
+  mvaWP.push_back(-10);//0.39);// 60% sig eff for base+prob
+  mvaWP.push_back(-10);//0.42);// 60% sig eff for base+prob+cost
  
   vector<double> cutsv;
   for(unsigned int i=0; i<21; i++) {
@@ -343,11 +349,16 @@ void mvaROC()
   vector<double> bkgpass[labelsv.size()];
   vector<double> bkgfail[labelsv.size()];
   
-  vector <double> Npass[labelsv.size()];
-  vector <double> Nfail[labelsv.size()];
-  vector <double> mvaNpass[labelsv.size()];
-  vector <double> mvaNfail[labelsv.size()];
-  
+  vector <double> sigNpass[labelsv.size()];
+  vector <double> sigNfail[labelsv.size()];
+
+  vector <double> totalSigPass[labelsv.size()];
+  vector <double> totalSigFail[labelsv.size()];
+  vector <double> totalSigPtPass[labelsv.size()];
+  vector <double> totalSigPtFail[labelsv.size()];
+  vector <double> totalBkg[labelsv.size()];
+  vector <double> totalBkgPtPass[labelsv.size()];   
+
   vector <double> ptlow, pthigh;
   ptlow.push_back(0);   pthigh.push_back(20);
   ptlow.push_back(20);  pthigh.push_back(40);
@@ -362,21 +373,11 @@ void mvaROC()
   ptlow.push_back(260); pthigh.push_back(300);
   ptlow.push_back(300); pthigh.push_back(340);
   ptlow.push_back(340); pthigh.push_back(400);
+  ptlow.push_back(400); pthigh.push_back(460);
+  ptlow.push_back(460); pthigh.push_back(520);
+  ptlow.push_back(520); pthigh.push_back(600);
 
-  vector <double> mvalow, mvahigh;
-
-  mvalow.push_back(-1.0); mvahigh.push_back(-0.8);
-  mvalow.push_back(-0.8); mvahigh.push_back(-0.6);
-  mvalow.push_back(-0.6); mvahigh.push_back(-0.4);
-  mvalow.push_back(-0.4); mvahigh.push_back(-0.2);
-  mvalow.push_back(-0.2); mvahigh.push_back(0.0);
-  mvalow.push_back(0.0);  mvahigh.push_back(0.2);
-  mvalow.push_back(0.2);  mvahigh.push_back(0.4);
-  mvalow.push_back(0.4);  mvahigh.push_back(0.6);
-  mvalow.push_back(0.6);  mvahigh.push_back(0.8);
-  mvalow.push_back(0.8);  mvahigh.push_back(1.0);
-
-
+  
   for(unsigned int iw=0; iw<labelsv.size(); iw++) {
     for(unsigned int ic=0; ic<cutsv.size(); ic++) {
       sigpass[iw].push_back(0);
@@ -386,21 +387,32 @@ void mvaROC()
     }
 
     for(unsigned int ic=0; ic<ptlow.size(); ic++) {
-      Npass[iw].push_back(0);
-      Nfail[iw].push_back(0);
-    }
-    for(unsigned int it=0; it<mvalow.size(); it++){
-      mvaNpass[iw].push_back(0);
-      mvaNfail[iw].push_back(0);
+      sigNpass[iw].push_back(0);
+      sigNfail[iw].push_back(0);
+      totalSigPass[iw].push_back(0);
+      totalSigFail[iw].push_back(0);
+      totalSigPtPass[iw].push_back(0);
+      totalSigPtFail[iw].push_back(0);
+      totalBkg[iw].push_back(0);
+      totalBkgPtPass[iw].push_back(0);
     }
   }
 
-  vector<TGraphErrors*> MvaEff;
+
   vector<TGraphErrors*> TopEff;
+  vector<TGraphErrors*> totalTopEff;
+  vector<TGraphErrors*> afterPtCutTopEff;
   vector<TGraphErrors*> rocsv;
 
   float sigmva[labelsv.size()];
   float bkgmva[labelsv.size()];
+
+  vector <float> gentoppt[labelsv.size()];
+  vector <float> gentoppt_cut[labelsv.size()];
+  vector <float> siggentopptPASS[labelsv.size()];
+  vector <float> siggentopptFAIL[labelsv.size()];
+  vector <float> siggentoppt_cutPASS[labelsv.size()];
+  vector <float> siggentoppt_cutFAIL[labelsv.size()];
   
   for(unsigned int ifile=0; ifile < infilename.size(); ifile++){
     
@@ -419,6 +431,7 @@ void mvaROC()
     float topmva;
     TLorentzVector *vjet1=0, *vjet2=0, *vjet3=0;
     TLorentzVector *q1vec=0, *q2vec=0, *q3vec=0;
+    TLorentzVector *vpar1=0, *vpar2=0, *vpar3=0;
  
         
     std::cout << "Processing " << infilename[ifile] << "..." << std::endl;
@@ -490,11 +503,16 @@ void mvaROC()
       intree->SetBranchAddress("q2vec", &q2vec);
       intree->SetBranchAddress("q3vec", &q3vec);
     }
+    if(intree->GetBranchStatus("vpar1")==1){
+      intree->SetBranchAddress("vpar1", &vpar1);
+      intree->SetBranchAddress("vpar2", &vpar2);
+      intree->SetBranchAddress("vpar3", &vpar3);
+    }
     vector<float> comboMVA;
     vector < std::pair <int,int> > entryNum;
+
     
     for(unsigned int ientry=0; ientry<intree->GetEntries(); ientry++) {
-
       
       unsigned int evt2Num=0;
       unsigned int evt1Num=0;
@@ -507,51 +525,90 @@ void mvaROC()
           
       comboMVA.push_back(topmva);
       entryNum.push_back(make_pair(ientry,isSig));
-           
-      if(evt2Num != evt1Num){
-	
+      
+      if(evt2Num != evt1Num){ //next combination belongs to next event 
+
 	// cout << "-------------- new event -------------" << endl;
+	// cout << "Event Num: " << eventNum << endl;
+	  
 	float tmpMVA         = -999;
 	int   tmpSigEntryNum = -999; 
 	int   tmpBkgEntryNum = -999;
 	float m_jjj=-999, m_jj=-999;
-	float pt_jjj=0;
+	float sig_pt_jjj=0;
+	float bkg_pt_jjj=0;
 	
-	for(unsigned int i=0; i<comboMVA.size(); ++i){
+	for(unsigned int i=0; i<comboMVA.size(); ++i){ //loop through all combinations from this event
 	  
-	  if(entryNum[i].second==1){// signal 
+	  if(entryNum[i].second==1){//if a combination is signal 
 
 	    sigmva[ifile]  = comboMVA[i];
-	    tmpSigEntryNum = entryNum[i].first; 
-
-	  }else{                    // background
+	    tmpSigEntryNum = entryNum[i].first;
+	    
+	    
+	  }else{                    //if a combination is background
 	  	    
 	    bool next = false;
-	    if(ifile>3){
-	      if(bkgType==3) next=true;
+	    if(ifile>2){           //check if this input file is the z+jets background
+	      if(bkgType==3) next=true; //hack to skip events that are tt(1l) bkg
 	    }
 	    if (next) continue;
 	    
-	    if(comboMVA[i]>tmpMVA){
+	    if(comboMVA[i]>tmpMVA){//find the highest scoring background
 	      tmpMVA = comboMVA[i];
 	      tmpBkgEntryNum = entryNum[i].first;
 	    }
 	  }
 	}
 	
-	if(tmpSigEntryNum != -999){
+	unsigned int sigEventNum=-999;
+	unsigned int bkgEventNum=-999;
+	if(tmpSigEntryNum != -999){ //if a signal combination was found, access that entry
 	  intree->GetEntry(tmpSigEntryNum);
-	  TLorentzVector  j1 = *vjet1;
-	  TLorentzVector  j2 = *vjet2;
-	  TLorentzVector  j3 = *vjet3;
 
+	  sigEventNum = eventNum;   // get the signal event number
+	 
+	  TLorentzVector j1 = *vjet1; TLorentzVector j2 = *vjet2; TLorentzVector j3 = *vjet3;
 	  TLorentzVector q1 = *q1vec; TLorentzVector q2 = *q2vec; TLorentzVector q3 = *q3vec;
-
-	  pt_jjj = (q1+q2+q3).Pt();
+	  TLorentzVector v1 = *vpar1; TLorentzVector v2 = *vpar2; TLorentzVector v3 = *vpar3;
 	  
+	  
+	  sig_pt_jjj = (v1+v2+v3).Pt(); //(q1+q2+q3).Pt();
+	 
+	  if(sigEventNum!=-999){
+
+	    hGenParPt_sig[ifile]->Fill(v1.Pt());
+	    hGenParPt_sig[ifile]->Fill(v2.Pt());
+	    hGenParPt_sig[ifile]->Fill(v3.Pt());
+	    
+	    hGenParEta_sig[ifile]->Fill(fabs(v1.Eta()));
+	    hGenParEta_sig[ifile]->Fill(fabs(v2.Eta()));
+	    hGenParEta_sig[ifile]->Fill(fabs(v3.Eta()));
+	    
+	    hMatchTrijetPt[ifile]->Fill(sig_pt_jjj);
+
+	    // cout << "sig event num: " << sigEventNum << endl; 
+	    if(sigmva[ifile] > mvaWP[ifile]){
+	      // cout << "sig pass" << endl;
+	      siggentopptPASS[ifile].push_back(sig_pt_jjj);
+	      if(v1.Pt() > 25 && v2.Pt() > 25 && v3.Pt() > 25){
+		siggentoppt_cutPASS[ifile].push_back(sig_pt_jjj);
+		hMatchTrijetPt_ptcut[ifile]->Fill(sig_pt_jjj);
+	      }
+	    } else {
+	      // cout << "sig fail" << endl;
+	      siggentopptFAIL[ifile].push_back(sig_pt_jjj);
+	      if(v1.Pt() > 25 && v2.Pt() > 25 && v3.Pt() > 25){
+		siggentoppt_cutFAIL[ifile].push_back(sig_pt_jjj);
+		hMatchTrijetPt_ptcut[ifile]->Fill(sig_pt_jjj);
+	      }
+	    }
+	  }
+
+	  //Fill signal tree
 	  m_jj  = (j1+j2).M();
 	  m_jjj = (j1+j2+j3).M();
-	  	  
+	  
 	  sig_detaj1b = detaj1b;
 	  sig_detaj2b = detaj2b;
 	  sig_dphij1b = dphij1b;
@@ -572,7 +629,8 @@ void mvaROC()
 	  sig_mva     = sigmva[ifile];
 	  sig_mtop    = m_jjj;
 	  sig_mw      = m_jj;
-	  sig_genTopPt = pt_jjj;
+	  sig_genTopPt = sig_pt_jjj;
+	  sig_evtNum   = eventNum;
 	  sig_sample  = ifile;
 
 	  sigTree     ->Fill();
@@ -582,10 +640,35 @@ void mvaROC()
 	
 	if (tmpBkgEntryNum != -999) {
 	  intree->GetEntry(tmpBkgEntryNum);
-	  TLorentzVector  j1 = *vjet1;
-	  TLorentzVector  j2 = *vjet2;
-	  TLorentzVector  j3 = *vjet3;
+
+	  bkgEventNum = eventNum;
 	  
+	  TLorentzVector j1 = *vjet1; TLorentzVector j2 = *vjet2; TLorentzVector j3 = *vjet3;
+	  TLorentzVector q1 = *q1vec; TLorentzVector q2 = *q2vec; TLorentzVector q3 = *q3vec;
+	  TLorentzVector v1 = *vpar1; TLorentzVector v2 = *vpar2; TLorentzVector v3 = *vpar3;
+	  
+	  bkg_pt_jjj = (v1+v2+v3).Pt();//(q1+q2+q3).Pt();
+	  
+	  if(bkgEventNum!=-999 && bkgEventNum != sigEventNum){
+
+	    hGenParPt_bkg[ifile]->Fill(v1.Pt());
+	    hGenParPt_bkg[ifile]->Fill(v2.Pt());
+	    hGenParPt_bkg[ifile]->Fill(v3.Pt());
+	    
+	    hGenParEta_bkg[ifile]->Fill(fabs(v1.Eta()));
+	    hGenParEta_bkg[ifile]->Fill(fabs(v2.Eta()));
+	    hGenParEta_bkg[ifile]->Fill(fabs(v3.Eta()));
+	    	    
+	    // cout << "bkg event num: " << bkgEventNum << endl;
+	    gentoppt[ifile].push_back(bkg_pt_jjj);
+	    hTrijetPt[ifile]->Fill(bkg_pt_jjj);
+	    
+	    if(v1.Pt() > 25 && v2.Pt() > 25 && v3.Pt() > 25){
+	      gentoppt_cut[ifile].push_back(bkg_pt_jjj);
+	      hTrijetPt_ptcut[ifile]->Fill(bkg_pt_jjj);
+	    }
+	  }
+	    
 	  m_jj  = (j1+j2).M();
 	  m_jjj = (j1+j2+j3).M();
 	 	  
@@ -614,20 +697,18 @@ void mvaROC()
 	  bkg_mva     = bkgmva[ifile];
 	  bkg_mtop    = m_jjj;
 	  bkg_mw      = m_jj;
+	  bkg_evtNum  = eventNum;
 	  bkg_sample  = ifile;
-
+	  
 	  bkgTree     ->Fill();
 	  
 	  // cout << "background event mva score: " << bkg_mva << endl;
-      }
+	}
 	
 	comboMVA.clear();
 	entryNum.clear();
-	
-	
-    }
-	
-      
+      }
+
       if(isSig == 1){
       	htopmvav[0]  ->Fill(topmva);
       	hbjcsv[0]    ->Fill(bjcsv);
@@ -737,6 +818,7 @@ void mvaROC()
       htopmvaBkg[0] ->Add(htopmvav[3]);
     }
 
+    
     gStyle->SetPalette(1);
     TCanvas *c = MakeCanvas("c","c",800,800);
     c->SetTickx(1);
@@ -754,44 +836,122 @@ void mvaROC()
       hj1csv[k]->Scale(norm_j1csv[k]);
       htopmvav[k]->Scale(norm_topmva_bkg);
     }
-      
-      
-      sprintf(ylabel,"Fraction / %.2f",htopmvav[ifile]->GetBinWidth(1));
-      sprintf(hname,"topmva_%i",ifile);
-      CPlot plottopmva(hname,"Top MVA","MVA score",ylabel);
-      plottopmva.AddHist1D(htopmvav[0],"Signal Top","hist",kRed+2,1,3004);
-      plottopmva.AddToStack(htopmvav[1],"B mismatch",kMagenta-6,kMagenta-6);
-      plottopmva.AddToStack(htopmvav[2],"W mismatch",kCyan-6,kCyan-6);
-      plottopmva.AddToStack(htopmvav[3],"B & W mismatch",kBlue-6,kBlue-6);
-      plottopmva.TransLegend(-0.35,+0.02);
-      plottopmva.Draw(c,true,"png");
 
-      sprintf(ylabel,"Fraction / %.2f", hj1csv[ifile]->GetBinWidth(1));
-      sprintf(hname,"j1csv_%i",ifile);
-      CPlot plotj1csv(hname,"jet1 csv","CSVv2+IVF",ylabel);
-      plotj1csv.AddHist1D(hj1csv[0],"Signal Top","hist",kRed+2,1,3004);
-      plotj1csv.AddToStack(hj1csv[1],"B mismatch",kMagenta-6,kMagenta-6);
-      plotj1csv.AddToStack(hj1csv[2],"W mismatch",kCyan-6,kCyan-6);
-      plotj1csv.AddToStack(hj1csv[3],"B & W mismatch",kBlue-6,kBlue-6);
-      plotj1csv.TransLegend(-0.35,+0.02);
-      plotj1csv.Draw(c,true,"png");
+    hAllTopsPt[ifile]->Add(hTrijetPt[ifile],hMatchTrijetPt[ifile]);
+    hAllTopsPt_ptcut[ifile]->Add(hTrijetPt_ptcut[ifile], hMatchTrijetPt_ptcut[ifile]);
+    
+    sprintf(ylabel,"Fraction / %.2f",hTrijetPt[ifile]->GetBinWidth(1));
+    sprintf(hname,"gentrijetpt_%i",ifile);
+    CPlot plotTrijetPt(hname,"","gen jjj p_{T}",ylabel);
+    plotTrijetPt.AddHist1D(hAllTopsPt[ifile],"All tops","hist",kRed+2,1,3004);
+    plotTrijetPt.AddHist1D(hAllTopsPt_ptcut[ifile],"All tops (gen par p_{T} > 25)","hist",kGreen+2,1,3003);
+    plotTrijetPt.AddHist1D(hMatchTrijetPt[ifile],"Match tops","hist",kBlack,1,3315);
+    plotTrijetPt.AddHist1D(hMatchTrijetPt_ptcut[ifile],"Match tops (gen par p_{T} > 25)","hist",kBlack,1,1001);
+    plotTrijetPt.TransLegend(-0.04,-0.02);
+    plotTrijetPt.Draw(c,true,"png");
 
-      delete infile;
-      infile=0, intree=0;
+    sprintf(ylabel, "Fraction / %.2f", hGenParPt_sig[ifile]->GetBinWidth(1));
+    sprintf(hname,"genpartonpt_%i",ifile);
+    CPlot plotParPt(hname,"", "gen parton p_{T}",ylabel);
+    plotParPt.AddHist1D(hGenParPt_bkg[ifile],"unmatched partons","hist",kRed+2,1,3004);
+    plotParPt.AddHist1D(hGenParPt_sig[ifile],"matched partons","hist",kBlack,1,3315);
+    plotParPt.TransLegend(-0.04,-0.02);
+    plotParPt.Draw(c,true,"png");
+
+    sprintf(ylabel, "Fraction / %.2f", hGenParEta_sig[ifile]->GetBinWidth(1));
+    sprintf(hname,"genpartoneta_%i",ifile);
+    CPlot plotParEta(hname,"", "gen parton |#eta|",ylabel);
+    plotParEta.AddHist1D(hGenParEta_bkg[ifile],"unmatched partons","hist",kRed+2,1,3004);
+    plotParEta.AddHist1D(hGenParEta_sig[ifile],"matched partons","hist",kBlack,1,3315);
+    plotParEta.TransLegend(-0.04,-0.02);
+    plotParEta.Draw(c,true,"png");
+						     
+    sprintf(ylabel,"Fraction / %.2f",htopmvav[ifile]->GetBinWidth(1));
+    sprintf(hname,"topmva_%i",ifile);
+    CPlot plottopmva(hname,"Top MVA","MVA score",ylabel);
+    plottopmva.AddHist1D(htopmvav[0],"Signal Top","hist",kRed+2,1,3004);
+    plottopmva.AddToStack(htopmvav[1],"B mismatch",kMagenta-6,kMagenta-6);
+    plottopmva.AddToStack(htopmvav[2],"W mismatch",kCyan-6,kCyan-6);
+    plottopmva.AddToStack(htopmvav[3],"B & W mismatch",kBlue-6,kBlue-6);
+    plottopmva.TransLegend(-0.35,+0.02);
+    plottopmva.Draw(c,true,"png");
+    
+    sprintf(ylabel,"Fraction / %.2f", hj1csv[ifile]->GetBinWidth(1));
+    sprintf(hname,"j1csv_%i",ifile);
+    CPlot plotj1csv(hname,"jet1 csv","CSVv2+IVF",ylabel);
+    plotj1csv.AddHist1D(hj1csv[0],"Signal Top","hist",kRed+2,1,3004);
+    plotj1csv.AddToStack(hj1csv[1],"B mismatch",kMagenta-6,kMagenta-6);
+    plotj1csv.AddToStack(hj1csv[2],"W mismatch",kCyan-6,kCyan-6);
+    plotj1csv.AddToStack(hj1csv[3],"B & W mismatch",kBlue-6,kBlue-6);
+    plotj1csv.TransLegend(-0.35,+0.02);
+    plotj1csv.Draw(c,true,"png");
+    
+    c->Close();
+    c->Delete();
+    delete infile;
+    infile=0, intree=0;
   }
   outFile->Write();
   outFile->Close();
+  
+    
+  for(unsigned int ifile=0; ifile < labelsv.size(); ifile++){
+    for(unsigned int ipt=0; ipt < ptlow.size(); ipt++){
+      for(unsigned int it=0; it < siggentopptPASS[ifile].size(); it++){
+	if(siggentopptPASS[ifile][it] > ptlow[ipt] && siggentopptPASS[ifile][it] < pthigh[ipt]){
+	  totalSigPass[ifile][ipt] += 1;
+	}
+      }
+      for(unsigned int it=0; it < siggentopptFAIL[ifile].size(); it++){
+	if(siggentopptFAIL[ifile][it] > ptlow[ipt] && siggentopptFAIL[ifile][it] < pthigh[ipt]){
+	  totalSigFail[ifile][ipt] += 1;
+	}
+      }
+      for(unsigned int it=0; it < siggentoppt_cutPASS[ifile].size(); it++){
+	if(siggentoppt_cutPASS[ifile][it] > ptlow[ipt] && siggentoppt_cutPASS[ifile][it] < pthigh[ipt]){
+	  totalSigPtPass[ifile][ipt] += 1;
+	}
+      }
+      for(unsigned int it=0; it < siggentoppt_cutFAIL[ifile].size(); it++){
+	if(siggentoppt_cutFAIL[ifile][it] > ptlow[ipt] && siggentoppt_cutFAIL[ifile][it] < pthigh[ipt]){
+	  totalSigPtFail[ifile][ipt] += 1;
+	}
+      }
+      for(unsigned int ig=0; ig < gentoppt[ifile].size(); ig++){
+	if(gentoppt[ifile][ig] > ptlow[ipt] && gentoppt[ifile][ig] < pthigh[ipt]){
+	  totalBkg[ifile][ipt] += 1;
+	}
+      }
+      for(unsigned int iq=0; iq < gentoppt_cut[ifile].size(); iq++){
+	if(gentoppt_cut[ifile][iq] > ptlow[ipt] && gentoppt_cut[ifile][iq] < pthigh[ipt]){
+	  totalBkgPtPass[ifile][ipt] += 1;
+	}
+      }
+    }
+  }
+
+  double signal_topeff   [labelsv.size()][ptlow.size()];
+  double total_topeff    [labelsv.size()][ptlow.size()];
+  double total_topeff_cut[labelsv.size()][ptlow.size()];
+  for(unsigned int iw=0; iw < labelsv.size(); iw++){
+    for(unsigned int ip=0; ip < ptlow.size(); ip++){
+      signal_topeff[iw][ip]      = totalSigPass[iw][ip]/(totalSigPass[iw][ip]+totalSigFail[iw][ip]);
+      total_topeff[iw][ip]       = totalSigPass[iw][ip]/(totalSigPass[iw][ip]+totalSigFail[iw][ip]+totalBkg[iw][ip]);
+      total_topeff_cut[iw][ip]   = totalSigPtPass[iw][ip]/(totalSigPtPass[iw][ip]+totalSigPtFail[iw][ip]+totalBkgPtPass[iw][ip]);
+    }
+  }
+  
   //
   // Read in signal and background trees for ROC curve
   //
  
   vector<TH1D*> hSigTopPt, hSigMtop, hSigMw, hBkgMtop, hBkgMw;
   for(unsigned int it=0; it<labelsv.size(); it++){
-     sprintf(hname,"gentoppt_%i",it);  hSigTopPt.push_back(new TH1D(hname,"",50,0,400)); hSigTopPt[it]->Sumw2();
-     sprintf(hname,"SigMtop_%i",it);hSigMtop.push_back(new TH1D(hname,"",50,100,400)); hSigMtop[it]->Sumw2();
-     sprintf(hname,"SigMw_%i",it); hSigMw.push_back(new TH1D(hname,"",50,0,250));       hSigMw[it]->Sumw2();
-     sprintf(hname,"BkgMtop_%i",it); hBkgMtop.push_back(new TH1D(hname,"",50,0,400));   hBkgMtop[it]->Sumw2();
-     sprintf(hname,"BkgMw_%i",it);hBkgMw.push_back(new TH1D(hname,"",50,0,250));       hBkgMw[it]->Sumw2();
+    sprintf(hname,"gentoppt_%i",it);  hSigTopPt.push_back(new TH1D(hname,"",50,0,400)); hSigTopPt[it]->Sumw2();
+    sprintf(hname,"SigMtop_%i",it);hSigMtop.push_back(new TH1D(hname,"",50,100,400));   hSigMtop[it]->Sumw2();
+    sprintf(hname,"SigMw_%i",it); hSigMw.push_back(new TH1D(hname,"",50,0,250));        hSigMw[it]->Sumw2();
+    sprintf(hname,"BkgMtop_%i",it); hBkgMtop.push_back(new TH1D(hname,"",50,0,400));    hBkgMtop[it]->Sumw2();
+    sprintf(hname,"BkgMw_%i",it);hBkgMw.push_back(new TH1D(hname,"",50,0,250));         hBkgMw[it]->Sumw2();
   }
 
   TFile *inSigBkgfile = TFile::Open("SigBkgROC.root");         assert(inSigBkgfile);
@@ -848,41 +1008,35 @@ void mvaROC()
   inBkgtree->SetBranchAddress("bkg_sample",  &bkg_sample);
 
   
-  vector < pair < float,float > > ptpaireff[labelsv.size()];
-  vector < pair < float,float > > mvapaireff[labelsv.size()];
+  vector < pair < float,float > > sig_ptpaireff[labelsv.size()];
   
   for(unsigned int isig=0; isig<inSigtree->GetEntries(); isig++) {
     inSigtree->GetEntry(isig);
     hSigTopPt[sig_sample]->Fill(sig_genTopPt);
-
-
     if(sig_mva > mvaWP[sig_sample]){ 
-
       
-      hSigTopPt[sig_sample]->Fill(sig_genTopPt);
       if(sig_mtop != -999){ hSigMtop[sig_sample]->Fill(sig_mtop); }
       if(sig_mw   != -999){ hSigMw[sig_sample]  ->Fill(sig_mw);   }
 
-      ptpaireff[sig_sample].push_back(make_pair(1,sig_genTopPt));
-      mvapaireff[sig_sample].push_back(make_pair(1,sig_mva));
+      sig_ptpaireff[sig_sample].push_back(make_pair(1,sig_genTopPt));
     } else {
-
-      ptpaireff[sig_sample].push_back(make_pair(0,sig_genTopPt));
-      mvapaireff[sig_sample].push_back(make_pair(0,sig_mva));
+      sig_ptpaireff[sig_sample].push_back(make_pair(0,sig_genTopPt));
     }
     
     for(unsigned int ic=0; ic<cutsv.size(); ic++) {
-	bool sig_pass = sig_mva > cutsv[ic];
-	if(sig_pass){ sigpass[sig_sample][ic] += 1; }
-	else        { sigfail[sig_sample][ic] += 1; }
-      }
+      bool sig_pass = sig_mva > cutsv[ic];
+      if(sig_pass){ sigpass[sig_sample][ic] += 1; }
+      else        { sigfail[sig_sample][ic] += 1; }
+    }
   }
   
   for(unsigned int ibkg=0; ibkg<inBkgtree->GetEntries(); ibkg++){
     inBkgtree->GetEntry(ibkg);
+    
     if(bkg_mva > mvaWP[bkg_sample]){
       if(bkg_mtop != -999){ hBkgMtop[bkg_sample]->Fill(bkg_mtop); }
       if(bkg_mw   != -999){ hBkgMw[bkg_sample]  ->Fill(bkg_mw);   }
+
     }
     
     for(unsigned int ic=0; ic<cutsv.size();ic++){
@@ -896,6 +1050,7 @@ void mvaROC()
   inSigBkgfile=0, inSigtree=0, inBkgtree=0;
 
   for(unsigned int it=0; it<labelsv.size(); it++){
+    
     hSigTopPt[it]->Scale(1.0/hSigTopPt[it]->Integral());
     hSigMtop[it] ->Scale(1.0/hSigMtop[it] ->Integral());
     hSigMw[it]   ->Scale(1.0/hSigMw[it]   ->Integral());
@@ -910,57 +1065,40 @@ void mvaROC()
     for(unsigned int icut=0; icut<cutsv.size(); icut++) {    
       sigeff[iw][icut] = sigpass[iw][icut]/(sigpass[iw][icut]+sigfail[iw][icut]);
       bkgeff[iw][icut] = bkgpass[iw][icut]/(bkgpass[iw][icut]+bkgfail[iw][icut]);  
+      // cout << "MVA cut: " << cutsv[icut] <<  " sig eff: " << sigeff[iw][icut] << endl;
     }
+   
   }
 
   for(unsigned int is=0; is < labelsv.size(); ++is){
     for(unsigned int ilw=0; ilw < ptlow.size(); ++ilw){
-      for(unsigned int ip=0; ip < ptpaireff[is].size(); ++ip){
-	if(ptpaireff[is][ip].second > ptlow[ilw] && ptpaireff[is][ip].second < pthigh[ilw]){
-	  if     (ptpaireff[is][ip].first==1)     { Npass[is][ilw] += 1; }
-	  else if(ptpaireff[is][ip].first==0)     { Nfail[is][ilw] += 1; }
+      for(unsigned int ip=0; ip < sig_ptpaireff[is].size(); ++ip){
+	if(sig_ptpaireff[is][ip].second > ptlow[ilw] && sig_ptpaireff[is][ip].second < pthigh[ilw]){
+	  if     (sig_ptpaireff[is][ip].first==1)     { sigNpass[is][ilw] += 1; }
+	  else if(sig_ptpaireff[is][ip].first==0)     { sigNfail[is][ilw] += 1; }
 	}
       }
-    }
-    
-    for(unsigned int imv=0; imv < mvalow.size(); ++imv){
-      for(unsigned int ip=0; ip < mvapaireff[is].size(); ++ip){
-	if(mvapaireff[is][ip].second > mvalow[imv] && mvapaireff[is][ip].second < mvahigh[imv]){
-	  if(mvapaireff[is][ip].first==1)         {mvaNpass[is][imv] += 1; }
-	  if(mvapaireff[is][ip].first==0)         {mvaNfail[is][imv] += 1; }
-	}
-      }
-    }
-  }
-
-  double topeff[labelsv.size()][ptlow.size()];
-  for(unsigned int iw=0; iw < labelsv.size(); iw++){
-    for(unsigned int ip=0; ip < ptlow.size(); ip++){
-      topeff[iw][ip] = Npass[iw][ip]/(Npass[iw][ip]+Nfail[iw][ip]);
-    }
-  }
-  double mvaeff[labelsv.size()][mvalow.size()];
-  for(unsigned int iw=0; iw < labelsv.size(); iw++){
-    for(unsigned int ip=0; ip < mvalow.size(); ip++){
-      mvaeff[iw][ip] = mvaNpass[iw][ip]/(mvaNpass[iw][ip]+mvaNfail[iw][ip]);
     }
   }
   
-
+  
+  double topeff      [labelsv.size()][ptlow.size()];
+  for(unsigned int iw=0; iw < labelsv.size(); iw++){
+    for(unsigned int ip=0; ip < ptlow.size(); ip++){
+      topeff[iw][ip]       = sigNpass[iw][ip]/(sigNpass[iw][ip]+sigNfail[iw][ip]);
+    }
+  }
+  
   double ptmid[ptlow.size()];
   for(unsigned int im=0; im<ptlow.size(); im++){
     ptmid[im] = (ptlow[im]+pthigh[im])/2.0;
   }
 
-  double mvamid[mvalow.size()];
-  for(unsigned int im=0; im<mvalow.size(); im++){
-    mvamid[im] = (mvalow[im]+mvahigh[im])/2.0;
-  }
-
   for(unsigned int iw=0; iw<labelsv.size(); iw++) {
     rocsv.push_back(new TGraphErrors(cutsv.size(), sigeff[iw], bkgeff[iw], 0, 0));
-    TopEff.push_back(new TGraphErrors(ptlow.size(), ptmid, topeff[iw], 0 ,0));
-    MvaEff.push_back(new TGraphErrors(mvalow.size(), mvamid, mvaeff[iw],0,0));
+    TopEff.push_back(new TGraphErrors(ptlow.size(), ptmid, signal_topeff[iw], 0 ,0));
+    totalTopEff.push_back(new TGraphErrors(ptlow.size(), ptmid, total_topeff[iw], 0 ,0));
+    afterPtCutTopEff.push_back(new TGraphErrors(ptlow.size(), ptmid, total_topeff_cut[iw], 0, 0));
   }
   
  
@@ -1018,19 +1156,56 @@ void mvaROC()
     ploteff.AddGraph(TopEff[iw],labelsv[iw].c_str(),"CP",colorsv[iw],kFullDotLarge,7);
   }
   ploteff.SetYRange(0,1);
-  ploteff.SetXRange(0,400);
-  ploteff.TransLegend(-0.05,-0.02);
+  ploteff.SetXRange(0,600);
+  ploteff.TransLegend(-0.3,-0.02);
   ploteff.Draw(c,true,"png");
 
-
-  CPlot plotmvaeff("mvaeffvsscore","","mva score", "#epsilon");
-  for(unsigned int im=0; im<labelsv.size(); im++) {
-    plotmvaeff.AddGraph(MvaEff[im], labelsv[im].c_str(),"CP",colorsv[im], kFullDotLarge,7);
+  
+  CPlot plotefftotal("total_topeffvspt","","top p_{T}","#epsilon");
+  for(unsigned int iw=0; iw<labelsv.size(); iw++) {
+    plotefftotal.AddGraph(totalTopEff[iw],labelsv[iw].c_str(),"CP",colorsv[iw],kFullDotLarge,7);
   }
-  plotmvaeff.SetYRange(0,1);
-  plotmvaeff.SetXRange(-1,1);
-  plotmvaeff.TransLegend(-0.05,-0.02);
-  plotmvaeff.Draw(c,true,"png");
+  plotefftotal.SetYRange(0,1);
+  plotefftotal.SetXRange(0,600);
+  plotefftotal.TransLegend(-0.3,-0.02);
+  plotefftotal.Draw(c,true,"png");
+
+
+  CPlot ploteffptcut("afterPtCut_topeffvspt","","top p_{T}","#epsilon");
+  for(unsigned int iw=0; iw<labelsv.size(); iw++) {
+    ploteffptcut.AddGraph(afterPtCutTopEff[iw],labelsv[iw].c_str(),"CP",colorsv[iw],kFullDotLarge,7);
+  }
+  ploteffptcut.SetYRange(0,1);
+  ploteffptcut.SetXRange(0,600);
+  ploteffptcut.TransLegend(-0.3,-0.02);
+  ploteffptcut.Draw(c,true,"png");
+
+  CPlot plotbaseMVAeff("baseMVA_effvspt","Base MVA Efficiency","top p_{T}","signal #epsilon");
+  plotbaseMVAeff.AddGraph(TopEff[0],"matched", "CP", kBlue, kFullDotLarge,7);
+  plotbaseMVAeff.AddGraph(totalTopEff[0],"all", "CP", kAzure+5, kFullDotLarge,7);
+  plotbaseMVAeff.AddGraph(afterPtCutTopEff[0], "after p_{T} cut", "CP", kViolet+3, kFullDotLarge,7);
+  plotbaseMVAeff.SetYRange(0,1);
+  plotbaseMVAeff.SetXRange(0,600);
+  plotbaseMVAeff.TransLegend(-0.4, -0.02);
+  plotbaseMVAeff.Draw(c,true,"png");
+
+  CPlot plotbaseprobeff("baseMVA+prob_effvspt","Base MVA+Prob Efficiency","top p_{T}","signal #epsilon");
+  plotbaseprobeff.AddGraph(TopEff[1],"matched", "CP", kBlue, kFullDotLarge,7);
+  plotbaseprobeff.AddGraph(totalTopEff[1],"all", "CP", kAzure+5, kFullDotLarge,7);
+  plotbaseprobeff.AddGraph(afterPtCutTopEff[1], "after p_{T} cut", "CP", kViolet+3, kFullDotLarge,7);
+  plotbaseprobeff.SetYRange(0,1);
+  plotbaseprobeff.SetXRange(0,600);
+  plotbaseprobeff.TransLegend(-0.4, -0.02);
+  plotbaseprobeff.Draw(c,true,"png");
+
+  CPlot plotMVA3eff("baseMVA+prob+cost_effvspt","Base MVA+Prob+Cost Efficiency","top p_{T}","signal #epsilon");
+  plotMVA3eff.AddGraph(TopEff[2],"matched", "CP", kBlue, kFullDotLarge,7);
+  plotMVA3eff.AddGraph(totalTopEff[2],"all", "CP", kAzure+5, kFullDotLarge,7);
+  plotMVA3eff.AddGraph(afterPtCutTopEff[2], "after p_{T} cut", "CP", kViolet+3, kFullDotLarge,7);
+  plotMVA3eff.SetYRange(0,1);
+  plotMVA3eff.SetXRange(0,600);
+  plotMVA3eff.TransLegend(-0.4, -0.02);
+  plotMVA3eff.Draw(c,true,"png");
 
   
   for(unsigned int it=0; it<labelsv.size(); it++){
@@ -1049,7 +1224,7 @@ void mvaROC()
     plotMw.AddHist1D(hSigMw[it], "Signal","hist",kRed+2,1,3004);
     plotMw.TransLegend(-0.05,-0.05);
     plotMw.Draw(c,true,"png");
-
+  
     sprintf(ylabel,"Fraction / %.2f",hSigTopPt[it]->GetBinWidth(1));
     sprintf(hname,"genTopPt_%i",it);
     CPlot plotGenTopPt(hname,"","gen top p_{T}",ylabel);
