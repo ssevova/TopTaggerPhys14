@@ -31,7 +31,7 @@ void mvaTrain()
   // Settings
   //==============================================================================================================
   const bool   doHighPt  = true;
-  const string infilename("trainingbits_semilep.root");
+  const string infilename("trainingbits_tthad_ptsort.root");
 
   string outfilename;
   // if(doHighPt){
@@ -41,7 +41,7 @@ void mvaTrain()
   //   outfilename = "toptrainingbits_noMdrop_noDR_lowpt.root";
   // }
 
-  outfilename = "toptrainingbits_baseMVA.root";
+  outfilename = "toptrainingbits_ptsort_baseMVA.root";
   const double TOPMASSLOW  = 100;
   const double TOPMASSHIGH = 300;
   
@@ -51,7 +51,7 @@ void mvaTrain()
   
   unsigned int isSig, b_mis, w_mis, wb_mis, evtType, eventNum;
   TLorentzVector *vjet1=0, *vjet2=0, *vjet3=0;
-  float qgid1, qgid2, detaj1b, detaj2b, dphij1b, dphij2b, drj1b, drj2b, bjcsv, jet1csv, jet2csv, mdrop, mtop, prob, cost, cosTS1, cosTS2; 
+  float qgid1, qgid2, dphij1b, dphij2b, drj1b, drj2b, bjcsv, jet1csv, jet2csv, mdrop, mtop, prob, cost; //cosTS1, cosTS2; 
    
   //
   // trees for TMVA training
@@ -69,8 +69,6 @@ void mvaTrain()
   // t_sig->Branch("mdrop", &mdrop);
   t_sig->Branch("qgid1",  &qgid1);
   t_sig->Branch("qgid2",  &qgid2);
-  // t_sig->Branch("detaj1b",&detaj1b);
-  // t_sig->Branch("detaj2b",&detaj2b);
   t_sig->Branch("dphij1b",&dphij1b);
   t_sig->Branch("dphij2b",&dphij2b);
   t_sig->Branch("drj1b",  &drj1b);
@@ -91,8 +89,6 @@ void mvaTrain()
   // t_bkg1->Branch("mdrop",  &mdrop);
   t_bkg1->Branch("qgid1",  &qgid1);
   t_bkg1->Branch("qgid2",  &qgid2);
-  // t_bkg1->Branch("detaj1b",&detaj1b);
-  // t_bkg1->Branch("detaj2b",&detaj2b);
   t_bkg1->Branch("dphij1b",&dphij1b);
   t_bkg1->Branch("dphij2b",&dphij2b);
   t_bkg1->Branch("drj1b",  &drj1b);
@@ -114,8 +110,6 @@ void mvaTrain()
   // t_bkg2->Branch("mdrop",  &mdrop);
   t_bkg2->Branch("qgid1",  &qgid1);
   t_bkg2->Branch("qgid2",  &qgid2);
-  // t_bkg2->Branch("detaj1b",&detaj1b);
-  // t_bkg2->Branch("detaj2b",&detaj2b);
   t_bkg2->Branch("dphij1b",&dphij1b);
   t_bkg2->Branch("dphij2b",&dphij2b);
   t_bkg2->Branch("drj1b",  &drj1b);
@@ -136,8 +130,6 @@ void mvaTrain()
   // t_bkg3->Branch("mdrop",  &mdrop);
   t_bkg3->Branch("qgid1",  &qgid1);
   t_bkg3->Branch("qgid2",  &qgid2);
-  // t_bkg3->Branch("detaj1b",&detaj1b);
-  // t_bkg3->Branch("detaj2b",&detaj2b);
   t_bkg3->Branch("dphij1b",&dphij1b);
   t_bkg3->Branch("dphij2b",&dphij2b);
   t_bkg3->Branch("drj1b",  &drj1b);
