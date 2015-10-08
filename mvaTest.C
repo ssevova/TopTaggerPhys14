@@ -34,8 +34,8 @@ void mvaTest()
   // Settings
   //==============================================================================================================
    
-  const string infilename("trainingbits_semilep.root");
-  const string outfilename("testingbits_baseMVA_tt1l.root");
+  const string infilename("trainingbits_tthad.root");
+  const string outfilename("testingbits_baseMVA+prob+cost_tt1l.root");
  
   const double TOPMASSLOW  = 100;
   const double TOPMASSHIGH = 300;
@@ -46,7 +46,7 @@ void mvaTest()
     
   //
   vector<string> weightfilesv;
-  weightfilesv.push_back("weights/toptrainingbits_baseMVA.root_BDTG.weights.xml");
+  weightfilesv.push_back("weights/toptrainingbits_kinfit.root_BDTG.weights.xml");
 
   unsigned int bkgType;
   unsigned int isSig, b_mis, w_mis, wb_mis, evtType, eventNum;
@@ -57,6 +57,7 @@ void mvaTest()
   float mtop;
   TLorentzVector *q1vec=0, *q2vec=0, *q3vec=0;
   TLorentzVector *vjet1=0, *vjet2=0, *vjet3=0;
+  TLorentzVector *vpar1=0, *vpar2=0, *vpar3=0;
 
   TFile *outFile = new TFile(outfilename.c_str(),"RECREATE");
   TTree *outTree = new TTree("Events","Events");  
@@ -82,8 +83,8 @@ void mvaTest()
   outTree->Branch("bjcsv",     &bjcsv,     "bjcsv/F");
   outTree->Branch("jet1csv",   &jet1csv,   "jet1csv/F");
   outTree->Branch("jet2csv",   &jet2csv,   "jet2csv/F");
-  // outTree->Branch("prob",      &prob,      "prob/F");
-  // outTree->Branch("cost",      &cost,      "cost/F");
+  outTree->Branch("prob",      &prob,      "prob/F");
+  outTree->Branch("cost",      &cost,      "cost/F");
   // outTree->Branch("cosTS1",     &cosTS1,     "cosTS1/F");
   // outTree->Branch("cosTS2",     &cosTS2,     "cosTS2/F");
   outTree->Branch("q1vec", "TLorentzVector", &q1vec);
@@ -92,6 +93,10 @@ void mvaTest()
   outTree->Branch("vjet1", "TLorentzVector", &vjet1);
   outTree->Branch("vjet2", "TLorentzVector", &vjet2);
   outTree->Branch("vjet3", "TLorentzVector", &vjet3);
+  outTree->Branch("vpar1", "TLorentzVector", &vpar1);
+  outTree->Branch("vpar2", "TLorentzVector", &vpar2);
+  outTree->Branch("vpar3", "TLorentzVector", &vpar3);
+  
   
 
   
@@ -115,8 +120,8 @@ void mvaTest()
     readers[iw]->AddVariable("bjcsv",  &bjcsv);
     readers[iw]->AddVariable("jet1csv", &jet1csv);
     readers[iw]->AddVariable("jet2csv", &jet2csv);
-    // readers[iw]->AddVariable("prob",    &prob);
-    // readers[iw]->AddVariable("cost",    &cost);
+    readers[iw]->AddVariable("prob",    &prob);
+    readers[iw]->AddVariable("cost",    &cost);
     // readers[iw]->AddVariable("cosTS1",    &cosTS1);
     // readers[iw]->AddVariable("cosTS2",    &cosTS2);
     readers[iw]->BookMVA("BDTG", weightfilesv[iw].c_str());
@@ -148,8 +153,8 @@ void mvaTest()
   intree->SetBranchAddress("bjcsv",    &bjcsv);
   intree->SetBranchAddress("jet1csv",  &jet1csv);
   intree->SetBranchAddress("jet2csv",  &jet2csv);
-  // intree->SetBranchAddress("prob",     &prob);
-  // intree->SetBranchAddress("cost",     &cost);
+  intree->SetBranchAddress("prob",     &prob);
+  intree->SetBranchAddress("cost",     &cost);
   // intree->SetBranchAddress("cosTS1",    &cosTS1);
   // intree->SetBranchAddress("cosTS2",    &cosTS2);
   intree->SetBranchAddress("q1vec",    &q1vec);
@@ -158,7 +163,9 @@ void mvaTest()
   intree->SetBranchAddress("vjet1",    &vjet1);
   intree->SetBranchAddress("vjet2",    &vjet2);
   intree->SetBranchAddress("vjet3",    &vjet3);
-      
+  intree->SetBranchAddress("vpar1",    &vpar1);
+  intree->SetBranchAddress("vpar2",    &vpar2);
+  intree->SetBranchAddress("vpar3",    &vpar3);
   
   
   for(unsigned int ientry=1; ientry<intree->GetEntries(); ientry++) {
